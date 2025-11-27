@@ -24,6 +24,8 @@ date: "2025-05-27"
 ### Install packages
 library(tidyverse)
 library(grf)
+library(kernelshap)
+library(shapviz)
 library(lmtest)
 library(sandwich)
 library(broom)
@@ -157,8 +159,30 @@ ggplot(var.imp, aes(x=varname, y=x)) +
 
 
 
-### 4) Comparison of CATE quintile ###
+### 4) SHAP Value ###
+# Obtain background data by random sampling 100 rows from X
+set.seed(1)
+X_bg <- X[sample(nrow(X), 100),]
 
+# Estimate SHAP values.
+shap_values <- kernelshap(
+  object = cf, # the causal forest model from above.
+  X = X, # the feature matrix 
+  bg_X = X_bg, # the background data
+  pred_fun = function(object, X) predict(object, X)$predictions # a custom prediction function to compute CATEs 
+)
+
+# Convert the output to a shapviz object for plotting
+sv <- shapviz(shap_values)
+
+# Plot SHAP values
+sv_importance(sv, bar_width = 0.6) +
+  ggtitle("SHAP Values") +
+  theme_minimal()
+
+
+
+### 5) Comparison of CATE quintile ###
 # Label CATE ranking
 data$ranking <- ranking
 
