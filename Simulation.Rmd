@@ -326,8 +326,8 @@ epsilon <- 0.01
 ps.hat.dr <- ifelse(ps.hat.dr < epsilon, epsilon, ifelse(ps.hat.dr > 1 - epsilon, 1 - epsilon, ps.hat.dr))
 
 # Compute the pseudo-outcome of the DR-learner
-augmented.term <- 1/ps.hat.dr * (data.dr$treatment * (data.dr$Y - mu1.hat.dr)) -
-  1/(1 - ps.hat.dr) * ((1 - data.dr$treatment) * (data.dr$Y - mu0.hat.dr))
+augmented.term <- 1/ps.hat.dr * (data.dr$treatment * (data.dr$outcome - mu1.hat.dr)) -
+  1/(1 - ps.hat.dr) * ((1 - data.dr$treatment) * (data.dr$outcome - mu0.hat.dr))
 psi.dr <- mu1.hat.dr - mu0.hat.dr + augmented.term
 
 # Fit a random forest model to the pseudo-outcome
