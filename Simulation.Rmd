@@ -302,22 +302,6 @@ mu1.hat.dr <- rep(0, nrow(data.dr))
 mu1.hat.dr[data.dr$treatment == 1] <- dr_learner_m1$predictions
 mu1.hat.dr[data.dr$treatment == 0] <- predict(dr_learner_m1, data.dr_0)$predictions
 
-# Compute the pseudo-outcome via the estimated outcome models 
-psi.dr0 <- predict(dr_learner_m1, data.dr_0)$predictions - data.dr_0$outcome
-psi.dr1 <- data.dr_1$outcome - predict(dr_learner_m0, data.dr_1)$predictions
-
-# Fit models for the pseudo-outcome for each treatment group
-dr_learner_tau0 <- ranger(y = psi.dr0, x = data.dr_0[, covariates], keep.inbag = TRUE, seed = 1, num.threads = 10)
-dr_learner_tau1 <- ranger(y = psi.dr1, x = data.dr_1[, covariates], keep.inbag = TRUE, seed = 1, num.threads = 10)
-
-# Compute treatment effect for each treatment group 
-tau0.hat.dr <- rep(0, nrow(data.dr))
-tau0.hat.dr[treatment == 0] <- dr_learner_tau0$predictions
-tau0.hat.dr[treatment == 1] <- predict(dr_learner_tau0, data.dr_1)$predictions
-tau1.hat.dr <- rep(0, nrow(data.dr))
-tau1.hat.dr[treatment == 1] <- dr_learner_tau1$predictions
-tau1.hat.dr[treatment == 0] <- predict(dr_learner_tau1, data.dr_0)$predictions
-
 # Calculate propensity score
 ps.dr <- ranger(y = data.dr$treatment, x = data.dr[, covariates], probability = TRUE)
 ps.hat.dr <- ps.dr$predictions[,2] 
